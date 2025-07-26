@@ -10,7 +10,7 @@ const PostActionButton = () => {
           size={18}
           className="group-hover:scale-110 transition-transform"
         />
-        <span className="font-medium">12</span>
+        <span className="font-medium">0</span>
       </button>
 
       {/* Like Down */}
@@ -19,7 +19,7 @@ const PostActionButton = () => {
           size={18}
           className="group-hover:scale-110 transition-transform"
         />
-        <span className="font-medium">2</span>
+        <span className="font-medium">0</span>
       </button>
 
       {/* Comment */}
@@ -28,7 +28,7 @@ const PostActionButton = () => {
           size={18}
           className="group-hover:scale-110 transition-transform"
         />
-        <span className="font-medium">5</span>
+        <span className="font-medium">0</span>
       </button>
 
       {/* Share */}

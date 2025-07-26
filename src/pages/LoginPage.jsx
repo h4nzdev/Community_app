@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -22,7 +24,7 @@ function LoginPage() {
 
   const handleSubmit = () => {
     if (isLogin) {
-      alert("Login functionality would be implemented here");
+      navigate("/")
     } else {
       if (formData.password !== formData.confirmPassword) {
         alert("Passwords don't match!");

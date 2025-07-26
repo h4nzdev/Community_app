@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
-    <nav className="bg-gradient-to-r rounded from-slate-600 to-slate-700 text-white p-4 w-full shadow-lg">
+    <nav className="bg-gradient-to-r rounded from-slate-600 to-slate-700 text-white p-4 w-full shadow-lg mt-4">
       <div className="flex justify-between items-center">
         {/* Logo */}
         <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">

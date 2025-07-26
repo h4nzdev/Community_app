@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { posts } from "../../data/feed";
 import AddPost from "../AddPost";
 import PostCard from "./PostCard";
 
 const PostsFeed = () => {
+  const [userPosts, setUserPosts] = useState(posts);
   return (
     <div
       className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide"
@@ -17,11 +18,11 @@ const PostsFeed = () => {
       <div className="w-full">
         <div className="w-full max-w-none">
           {/* Add Post Section */}
-          <AddPost />
+          <AddPost userPosts={userPosts} setUserPosts={setUserPosts} />
 
           {/* Posts Feed */}
           <div className="space-y-4">
-            {posts.map((post) => (
+            {userPosts.map((post) => (
               <PostCard
                 key={post.id}
                 author={post.author}
