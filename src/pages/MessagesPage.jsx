@@ -1,110 +1,204 @@
-import React, { useState } from 'react';
+"use client";
 
-const MessagesPage = ({ darkMode }) => {
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [newMessage, setNewMessage] = useState('');
-  
-  const chats = [
-    { id: 1, name: 'Alex', username: 'alex123', lastMessage: 'Hey! How are you?', time: '2m' },
-    { id: 2, name: 'Sarah', username: 'sarah_dev', lastMessage: 'Thanks for the help!', time: '1h' },
-    { id: 3, name: 'Mike', username: 'mike_design', lastMessage: 'See you tomorrow', time: '3h' },
-  ];
+import { useState } from "react";
+import { Send, Search } from "lucide-react";
+import { chats, user_messages } from "../data/feed";
 
-  const messages = selectedChat ? [
-    { id: 1, text: 'Hey! How are you?', sender: 'them', time: '2:30 PM' },
-    { id: 2, text: 'I\'m good! How about you?', sender: 'me', time: '2:31 PM' },
-    { id: 3, text: 'Doing great, thanks for asking!', sender: 'them', time: '2:32 PM' },
-  ] : [];
+function MessagesPage() {
+  const [selectedChat, setSelectedChat] = useState(1);
+  const [newMessage, setNewMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSendMessage = (e) => {
-    if (e) e.preventDefault();
+  const [messages, setMessages] = useState(user_messages);
+
+  const currentChat = chats.find((chat) => chat.id === selectedChat);
+  const currentMessages = messages[selectedChat] || [];
+
+  const handleSendMessage = () => {
     if (newMessage.trim()) {
-      setNewMessage('');
+      const newMsg = {
+        id: currentMessages.length + 1,
+        text: newMessage,
+        sender: "me",
+        time: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setMessages((prev) => ({
+        ...prev,
+        [selectedChat]: [...(prev[selectedChat] || []), newMsg],
+      }));
+
+      setNewMessage("");
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const filteredChats = chats.filter(
+    (chat) =>
+      chat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      chat.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="flex h-96">
-      <div className={`w-1/3 border-r ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
-        <div className={`p-4 border-b ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
-          <h2 className={`font-bold ${darkMode ? 'text-white' : 'text-slate-800'}`}>Messages</h2>
-        </div>
-        <div className="overflow-y-auto">
-          {chats.map((chat) => (
-            <button
-              key={chat.id}
-              onClick={() => setSelectedChat(chat)}
-              className={`w-full p-4 text-left border-b transition-colors ${
-                selectedChat?.id === chat.id
-                  ? darkMode ? 'bg-slate-700 border-slate-600' : 'bg-slate-100 border-slate-200'
-                  : darkMode ? 'hover:bg-slate-800 border-slate-700' : 'hover:bg-slate-50 border-slate-200'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${darkMode ? 'bg-slate-600 text-white' : 'bg-slate-200 text-slate-700'}`}>
-                  {chat.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`font-medium truncate ${darkMode ? 'text-white' : 'text-slate-800'}`}>{chat.name}</p>
-                  <p className={`text-sm truncate ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{chat.lastMessage}</p>
-                </div>
-                <span className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{chat.time}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-      
-      <div className="flex-1 flex flex-col">
-        {selectedChat ? (
-          <>
-            <div className={`p-4 border-b ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
-              <h3 className={`font-medium ${darkMode ? 'text-white' : 'text-slate-800'}`}>{selectedChat.name}</h3>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex h-screen">
+        {/* Chat List Sidebar */}
+        <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+          {/* Header */}
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+              Messages
+            </h1>
+
+            {/* Search */}
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+              />
             </div>
-            <div className="flex-1 p-4 space-y-3 overflow-y-auto">
-              {messages.map((message) => (
-                <div key={message.id} className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-xs px-3 py-2 rounded-lg ${
-                    message.sender === 'me'
-                      ? darkMode ? 'bg-slate-600 text-white' : 'bg-slate-600 text-white'
-                      : darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-800'
-                  }`}>
-                    <p>{message.text}</p>
-                    <p className={`text-xs mt-1 ${
-                      message.sender === 'me'
-                        ? 'text-slate-300'
-                        : darkMode ? 'text-slate-400' : 'text-slate-500'
-                    }`}>{message.time}</p>
+          </div>
+
+          {/* Chat List */}
+          <div className="flex-1 overflow-y-auto">
+            {filteredChats.map((chat) => (
+              <div
+                key={chat.id}
+                onClick={() => setSelectedChat(chat.id)}
+                className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                  selectedChat === chat.id
+                    ? "bg-blue-50 dark:bg-blue-900 border-r-2 border-blue-500"
+                    : ""
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                      {chat.name.charAt(0).toUpperCase()}
+                    </div>
+                    {chat.online && (
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-semibold text-gray-800 dark:text-gray-200 truncate">
+                        {chat.name}
+                      </h3>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {chat.time}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                        {chat.lastMessage}
+                      </p>
+                      {chat.unread > 0 && (
+                        <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                          {chat.unread}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-            <form onSubmit={handleSendMessage} className={`p-4 border-t ${darkMode ? 'border-slate-700' : 'border-slate-200'}`}>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className={`flex-1 px-3 py-2 rounded-lg border ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' : 'bg-white border-slate-200 text-slate-800'}`}
-                />
-                <button
-                  type="submit"
-                  className={`px-4 py-2 rounded-lg transition-colors ${darkMode ? 'bg-slate-600 hover:bg-slate-500 text-white' : 'bg-slate-600 hover:bg-slate-700 text-white'}`}
-                >
-                  Send
-                </button>
               </div>
-            </form>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <p className={`${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Select a chat to start messaging</p>
+            ))}
           </div>
-        )}
+        </div>
+
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Chat Header */}
+          <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center space-x-3">
+            <div className="relative">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                {currentChat?.name.charAt(0).toUpperCase()}
+              </div>
+              {currentChat?.online && (
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+              )}
+            </div>
+            <div>
+              <h2 className="font-semibold text-gray-800 dark:text-gray-200">
+                {currentChat?.name}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {currentChat?.online ? "Online" : "Offline"}
+              </p>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {currentMessages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.sender === "me" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                    message.sender === "me"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  }`}
+                >
+                  <p className="text-sm">{message.text}</p>
+                  <p
+                    className={`text-xs mt-1 ${
+                      message.sender === "me"
+                        ? "text-blue-100"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    {message.time}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Message Input */}
+          <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="flex items-center space-x-3">
+              <input
+                type="text"
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={handleSendMessage}
+                className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
-};
+}
 
-export default MessagesPage; 
+export default MessagesPage;
