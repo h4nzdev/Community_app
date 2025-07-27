@@ -1,15 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Navbar from "../components/NavBar";
 import Sidebar from "../components/SideBar/Sidebar";
 import MobileBottomNav from "../components/MobileResponsiveLayout/MobileBottomNav";
 import PostsFeed from "../components/Posts/PostsFeed";
 import MobileLayout from "../components/MobileResponsiveLayout/MobileLayout";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function HomePage() {
   // State for dark mode
+  const { user } = useContext(AuthContext);
   const [darkMode, setDarkMode] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, []);
 
   return (
     <div className={darkMode ? "dark" : ""}>

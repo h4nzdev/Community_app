@@ -5,6 +5,7 @@ import UserAccount from "./pages/UserAccount";
 import PostsPage from "./pages/PostsPage";
 import MessagesPage from "./pages/MessagesPage";
 import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignupPage";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="posts" element={<PostsPage />} />
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
     </BrowserRouter>
   );
