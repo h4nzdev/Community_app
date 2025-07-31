@@ -1,21 +1,24 @@
+import axios from "axios";
 import { Image, Smile } from "lucide-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Swal from "sweetalert2";
-const AddPost = ({ userPosts, setUserPosts }) => {
+import { AuthContext } from "../context/AuthContext";
+const AddPost = () => {
+  const {user} = useContext(AuthContext)
   const [post, setPost] = useState("");
 
-  const handlePost = () => {
+  const handlePost = async() => {
     const newPost = {
-      id: userPosts.length + 1,
-      author: "Hanz Christian Angelo",
-      nickname: "h_christian",
+      user_id: user.id,
+      nickname: user.username,
       content: post,
       timestamp: "just now",
     };
 
-    if (post.trim() == "") return;
+    const res = await axios.post("http://127.0.0.1:5000/api/posts", newPost)
+    console.log(res.data)
 
-    setUserPosts((prev) => [newPost, ...prev]);
+    if (post.trim() == "") return;
     Swal.fire({
       icon: "success",
       title: "Posted!",
