@@ -472,75 +472,51 @@ def get_comments(post_id):
 
 
 @app.route("/api/messages/<int:user_id>/conversations", methods=["GET"])
-def get_user_conversations(user_id):
-    """Get all conversations for a user"""
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+def get_conversations(user_id):
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
 
-    try:
-        # Get all unique conversations (people user has chatted with)
-        cursor.execute(
-            """
-            SELECT DISTINCT 
+    # Get all users who have chatted with the current user
+    c.execute(
+        """
+        SELECT 
+            u.id, u.full_name, u.username,
+            m.content as last_message,
+            m.timestamp
+        FROM users u
+        JOIN (
+            SELECT 
                 CASE 
-                    WHEN m.sender_id = ? THEN m.receiver_id 
-                    ELSE m.sender_id 
-                END as other_user_id,
-                u.full_name,
-                u.username,
-                (SELECT MAX(timestamp) FROM messages 
-                 WHERE (sender_id = ? AND receiver_id = other_user_id) 
-                    OR (sender_id = other_user_id AND receiver_id = ?)) as last_message_time,
-                (SELECT content FROM messages 
-                 WHERE ((sender_id = ? AND receiver_id = other_user_id) 
-                    OR (sender_id = other_user_id AND receiver_id = ?))
-                 ORDER BY timestamp DESC LIMIT 1) as last_message,
-                (SELECT COUNT(*) FROM messages 
-                 WHERE sender_id = other_user_id AND receiver_id = ? AND is_read = FALSE) as unread_count
-            FROM messages m
-            JOIN users u ON (CASE 
-                WHEN m.sender_id = ? THEN m.receiver_id 
-                ELSE m.sender_id 
-            END) = u.id
-            WHERE m.sender_id = ? OR m.receiver_id = ?
-            ORDER BY last_message_time DESC
-        """,
-            (
-                user_id,
-                user_id,
-                user_id,
-                user_id,
-                user_id,
-                user_id,
-                user_id,
-                user_id,
-                user_id,
-            ),
+                    WHEN sender_id = ? THEN receiver_id 
+                    ELSE sender_id 
+                END AS user_id,
+                MAX(id) as max_id
+            FROM messages
+            WHERE sender_id = ? OR receiver_id = ?
+            GROUP BY user_id
+        ) sub ON sub.user_id = u.id
+        JOIN messages m ON m.id = sub.max_id
+        ORDER BY m.timestamp DESC
+    """,
+        (user_id, user_id, user_id),
+    )
+
+    conversations = []
+    for row in c.fetchall():
+        conversations.append(
+            {
+                "id": row[0],
+                "name": row[1],
+                "username": row[2],
+                "lastMessage": row[3],
+                "time": row[4],
+                "unread": 0,
+                "online": False,  # Optional, you can upgrade later
+            }
         )
 
-        conversations = cursor.fetchall()
-
-        conversation_list = []
-        for conv in conversations:
-            conversation_list.append(
-                {
-                    "id": conv[0],
-                    "name": conv[1],
-                    "username": conv[2],
-                    "lastMessage": conv[4] or "No messages yet",
-                    "time": conv[3] or "",
-                    "unread": conv[5] or 0,
-                    "online": False,  # Simple implementation - always offline
-                }
-            )
-
-        return jsonify(conversation_list)
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        conn.close()
-
+    conn.close()
+    return jsonify(conversations)
 
 @app.route("/api/messages/<int:user_id>/<int:other_user_id>", methods=["GET"])
 def get_messages(user_id, other_user_id):
