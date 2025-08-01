@@ -12,7 +12,6 @@ const AddPost = ({ fetchPosts }) => {
       user_id: user.id,
       nickname: user.username,
       content: post,
-      timestamp: "just now",
     };
 
     const res = await axios.post("http://127.0.0.1:5000/api/posts", newPost);
