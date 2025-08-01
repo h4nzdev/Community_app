@@ -1,4 +1,5 @@
 import {
+  ArrowLeft,
   FileText,
   MessageCircle,
   Settings,
@@ -15,7 +16,16 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
   return (
     <div className="bg-white dark:bg-slate-800 p-6 h-screen overflow-y-auto shadow-lg border-r border-slate-200 dark:border-slate-700">
       <div className="flex flex-col gap-6">
-
+        {location.pathname === "/" ? (
+          ""
+        ) : (
+          <Link to="/">
+            <div className="flex items-center gap-4 text-white cursor-pointer">
+              <ArrowLeft />
+              <p className="hover:underline">Home Page</p>
+            </div>
+          </Link>
+        )}
         {/* User Account */}
         <SideBarButton
           link="/user-account"

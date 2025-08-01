@@ -1,7 +1,7 @@
 import React from "react";
 import { MessageCircle, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
 
-const PostActionButton = () => {
+const PostActionButton = ({ likes }) => {
   return (
     <div className="flex items-center md:space-x-8 md:justify-start justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
       {/* Like Up */}
@@ -10,7 +10,7 @@ const PostActionButton = () => {
           size={18}
           className="group-hover:scale-110 transition-transform"
         />
-        <span className="font-medium">0</span>
+        <span className="font-medium">{likes}</span>
       </button>
 
       {/* Like Down */}

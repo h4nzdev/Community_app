@@ -3,11 +3,11 @@ import { Image, Smile } from "lucide-react";
 import React, { useContext, useState } from "react";
 import Swal from "sweetalert2";
 import { AuthContext } from "../context/AuthContext";
-const AddPost = () => {
-  const {user} = useContext(AuthContext)
+const AddPost = ({ fetchPosts }) => {
+  const { user } = useContext(AuthContext);
   const [post, setPost] = useState("");
 
-  const handlePost = async() => {
+  const handlePost = async () => {
     const newPost = {
       user_id: user.id,
       nickname: user.username,
@@ -15,8 +15,8 @@ const AddPost = () => {
       timestamp: "just now",
     };
 
-    const res = await axios.post("http://127.0.0.1:5000/api/posts", newPost)
-    console.log(res.data)
+    const res = await axios.post("http://127.0.0.1:5000/api/posts", newPost);
+    console.log(res.data);
 
     if (post.trim() == "") return;
     Swal.fire({
@@ -27,6 +27,7 @@ const AddPost = () => {
       color: "#f8fafc",
     });
 
+    fetchPosts();
     setPost("");
   };
 

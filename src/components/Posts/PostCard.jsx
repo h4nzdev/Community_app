@@ -1,7 +1,7 @@
 import React from "react";
 import PostActionButton from "./PostActionButton";
 
-const PostCard = ({ author, nickname, content, timestamp = "2h ago" }) => {
+const PostCard = ({ author, nickname, content, timestamp, likes }) => {
   return (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-lg mb-4 border border-slate-200 dark:border-slate-700 hover:shadow-xl transition-shadow">
       {/* Author Info */}
@@ -28,7 +28,7 @@ const PostCard = ({ author, nickname, content, timestamp = "2h ago" }) => {
       </div>
 
       {/* Action Buttons */}
-      <PostActionButton />
+      <PostActionButton likes={likes} />
     </div>
   );
 };

@@ -18,13 +18,27 @@ function LoginPage() {
         email,
         password,
       });
-      setUser(res.data.user);
-      sessionStorage.setItem("user", JSON.stringify(res.data.user));
-      setEmail("");
-      setPassword("");
-      navigate("/");
+
+      // If login success
+      if (res.data.success) {
+        sessionStorage.setItem("user", JSON.stringify(res.data.user));
+        setUser(res.data.user);
+        setEmail("");
+        setPassword("");
+        navigate("/");
+      }
     } catch (error) {
-      console.error("Error in loggin : ", error);
+      // If login fails (wrong password or email), show backend message
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(error.response.data.message); // This will now show "Wrong Password" or "Email not found"
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+      console.error("Error in login: ", error);
     }
   };
 

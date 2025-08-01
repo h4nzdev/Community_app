@@ -1,7 +1,14 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { ThumbsUp, ThumbsDown, MessageCircle, Share2, Edit, Trash2 } from "lucide-react";
+import {
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+  Share2,
+  Edit,
+  Trash2,
+} from "lucide-react";
 import Sidebar from "../components/SideBar/Sidebar";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
@@ -24,13 +31,25 @@ function PostsPage() {
     fetchPosts();
   }, []);
 
+  const handleDelete = async (id) => {
+    try {
+      const res = await axios.delete(
+        `http://127.0.0.1:5000/api/delete-posts/${id}`
+      );
+      console.log(res.data.message);
+      fetchPosts();
+    } catch (error) {
+      console.error("Error on delete", error);
+    }
+  };
+
   console.log(posts);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex gap-8">
       {/* Sidebar */}
       <div className="w-72 flex-shrink-0">
-        <div className="sticky top-0">
+        <div className="sticky top-0 text-white">
           <Sidebar />
         </div>
       </div>
@@ -70,7 +89,10 @@ function PostsPage() {
                   <button className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg">
                     <Edit size={16} />
                   </button>
-                  <button className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg">
+                  <button
+                    onClick={() => handleDelete(post.id)}
+                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg"
+                  >
                     <Trash2 size={16} />
                   </button>
                 </div>
